@@ -1,0 +1,14 @@
+{
+  "name": "slippi-dev",
+  "version": "1.0.0",
+  "description": "slippi dev test",
+  "main": "slippi.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "FantasticDeli",
+  "license": "ISC",
+  "dependencies": {
+    "@slippi/slippi-js": "^7.0.0"
+  }
+}

@@ -1,4 +1,6 @@
 # Slippi-Stats-Analyzer
+This is a small project to parse Slippi files.
+It can display winrate info, grouped by character & stage.
 
 
 ## __This is a NodeJS project. You will need to install NodeJS__

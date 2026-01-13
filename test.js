@@ -11,16 +11,21 @@ let files = [], resultArray = [];
 // ###  Edit the below variable assignments - comments indicating what to change
 // ##################################################################################
 
-//Top-level folder for your Slippi files. Any sub-folders will be included.
+// Top-level folder for your Slippi files. Any sub-folders will be included.
+// This should be the full path, starting with C:\Users\ on Windows, or /home/username/... on Linux/Mac.
+// This MUST use forward slashes (/) even on Windows systems.
 slpFileDirectory = "/home/eric/Slippi/2025"; 
 
-//Your username, in the Slippi files. NOT your connect code.
-userToLookFor = "FantasticDeli"; 
+// Your username, in the Slippi files. Change at least one value to your own. The other can be blank.
+// Blank values should look like this:
+//      userToLookFor = {"displayName": "", "connectCode": ""};
+userToLookFor = {"displayName": "FantasticDeli", "connectCode": "DELI#945"};
 
 // Character you're playing as, or leave empty for all characters ("")
 myCharacter = "Fox"; 
 
-// Opponent characters to include. For all characters, uncomment the line below and comment out the next line. 
+// Opponent characters to include. Choose as many as you want - behavior is the same, just slower for more characters.
+// For all characters, uncomment the line below and comment out the next line. 
 // testCharacterArray = ["Sheik", "Fox", "Falco", "Marth", "Captain Falcon", "Jigglypuff", "Peach", "Yoshi", "Ice Climbers", "Samus", "Donkey Kong", "Luigi", "Pikachu", "Ness", "Kirby", "Mr. Game & Watch", "Young Link", "Link", "Zelda", "Bowser", "Ganondorf", "Mewtwo", "Roy", "Pichu", "Dr. Mario", "Mario"]; 
 testCharacterArray = ["Ganondorf"];
 
@@ -141,17 +146,20 @@ function processOneGame(gameFileLocation) {
     //get player indexes and characters
     let userIndex = -1;
     for (let i = 0; i < settings.players.length; i++) {
-        if (settings.players[i].displayName == userToLookFor) {
+        //Match on either display name or connect code, if they're set.
+        if (((userToLookFor.displayName != "") && (settings.players[i].displayName == userToLookFor.displayName))
+        || ((userToLookFor.connectCode != "") && (settings.players[i].connectCode == userToLookFor.connectCode))) {
+            
             userIndex = i;
             userCharacter = characters.getCharacterName(settings.players[i].characterId);
         }
-        else {
+        else { 
             opponentCharacter = characters.getCharacterName(settings.players[i].characterId);
             opponentIndex = i;
         }
     }
     if (userIndex === -1) {
-        console.log(`User ${userToLookFor} not found in game settings.`);
+        console.log(`User ${userToLookFor.displayName} - ${userToLookFor.connectCode} not found in game ${gameFileLocation}. This may be okay. Skipping this game.`);
         return "notFound"
     }
 
@@ -167,7 +175,8 @@ function checkWinOrLoss(game, userToLookFor) {
     //check if the user won or lost - singles only
     returnValue = false;
     game.getWinners().forEach((winner) => {
-        if (settings.players[winner.playerIndex].displayName === userToLookFor) {
+        if (((userToLookFor.displayName != "") && (settings.players[i].displayName == userToLookFor.displayName))
+        || ((userToLookFor.connectCode != "") && (settings.players[i].connectCode == userToLookFor.connectCode))) {
             // a win
             // console.log(`Player ${userToLookFor} won on stage ${stages.getStageName(settings.stageId)}!`);
             returnValue = true;

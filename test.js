@@ -3,9 +3,38 @@ const { SlippiGame, stages, characters } = require("@slippi/slippi-js");
 const fs = require('fs');
 const path = require('path');
 
-let files = [];
-directory = "/home/eric/Slippi/2025";
+let files = [], resultArray = [];
 
+
+// ##################################################################################
+// ###  If you downloaded this file, read this!
+// ###  Edit the below variable assignments - comments indicating what to change
+// ##################################################################################
+
+//Top-level folder for your Slippi files. Any sub-folders will be included.
+slpFileDirectory = "/home/eric/Slippi/2025"; 
+
+//Your username, in the Slippi files. NOT your connect code.
+userToLookFor = "FantasticDeli"; 
+
+// Character you're playing as, or leave empty for all characters ("")
+myCharacter = "Fox"; 
+
+// Opponent characters to include. For all characters, uncomment the line below and comment out the next line. 
+// testCharacterArray = ["Sheik", "Fox", "Falco", "Marth", "Captain Falcon", "Jigglypuff", "Peach", "Yoshi", "Ice Climbers", "Samus", "Donkey Kong", "Luigi", "Pikachu", "Ness", "Kirby", "Mr. Game & Watch", "Young Link", "Link", "Zelda", "Bowser", "Ganondorf", "Mewtwo", "Roy", "Pichu", "Dr. Mario", "Mario"]; 
+testCharacterArray = ["Ganondorf"];
+
+// Stages to include. For all stages, leave unchanged.
+testStageArray = ["Battlefield", "Pokémon Stadium", "Final Destination", "Yoshi's Story", "Dream Land N64", "Fountain of Dreams"];
+
+
+// ##################################################################################
+// ###  End of user-editable section
+// ##################################################################################
+
+
+
+//function to build the 'files' array with all SLP files in the directory and subdirectories
 const getFilesRecursively = (directory) => {
     console.log(`Reading directory: ${directory}`);
   const filesInDirectory = fs.readdirSync(directory);
@@ -18,22 +47,18 @@ const getFilesRecursively = (directory) => {
     }
   }
 };
-getFilesRecursively(directory);
+getFilesRecursively(slpFileDirectory);
 
 
-userToLookFor = "FantasticDeli";
-myCharacter = "Fox"; // Character you're playing as, or leave empty for all characters ("")
-// testCharacterArray = ["Sheik", "Fox", "Falco", "Marth", "Captain Falcon", "Jigglypuff", "Peach", "Yoshi", "Ice Climbers", "Samus", "Donkey Kong", "Luigi", "Pikachu", "Ness", "Kirby", "Mr. Game & Watch", "Young Link", "Link", "Zelda", "Bowser", "Ganondorf", "Mewtwo", "Roy", "Pichu", "Dr. Mario", "Mario"]; 
-testCharacterArray = ["Ganondorf"];
-testStageArray = ["Battlefield", "Pokémon Stadium", "Final Destination", "Yoshi's Story", "Dream Land N64", "Fountain of Dreams"];
-resultArray = [];
-
+//foreach loop, processing one character at a time
 testCharacterArray.forEach(testCharacter => {
     totalWins = 0;
     totalLosses = 0;
+    //nested foreach loop, processing one stage at a time for that character.
     testStageArray.forEach(testStage => {
         wins = 0;
         losses = 0;
+        //read through all of the files, incrementing wins/losses if they match the character/stage being tested.
         files.forEach(slpFile => {
             [userCharacter, opponentCharacter, stage, opponentName, winState] = processOneGame(slpFile);
             if ((userCharacter == myCharacter) || (myCharacter == "")) {
@@ -46,13 +71,17 @@ testCharacterArray.forEach(testCharacter => {
                 }
             }
         });
+        //after processing all files, calculate and store the win rate for that character/stage combination
         resultArray.push({ character: testCharacter, stage: testStage, winRate: (wins / (wins + losses) * 100).toFixed(2), totalGames: wins + losses });
-        console.log(`Win Rate: ${(wins / (wins + losses) * 100).toFixed(2)}% on ${testStage} vs ${testCharacter}    (${wins+losses} games) `);
+        //redundant code? can likely be removed.
+        // console.log(`Win Rate: ${(wins / (wins + losses) * 100).toFixed(2)}% on ${testStage} vs ${testCharacter}    (${wins+losses} games) `);
     });
+    //after processing all stages for that character, calculate and store the overall win rate for that character
     resultArray.push({ character: testCharacter + " Totals", stage: "", winRate: (totalWins / (totalWins + totalLosses) * 100).toFixed(2), totalGames: totalWins + totalLosses });
 
 });
 
+//sort the results array and print it out. compareGameResults function defined below.
 resultArray.sort(compareGameResults);
 resultArray.forEach(result => {
     console.log(`
@@ -90,7 +119,7 @@ function compareGameResults( a, b ) {
     return 0;
 }
 
-//read the SLP file
+//Process one game file, returning relevant data.
 function processOneGame(gameFileLocation) {
 
 
@@ -121,9 +150,10 @@ function processOneGame(gameFileLocation) {
             opponentIndex = i;
         }
     }
-    // if (userIndex === -1) {
-        // console.log(`User ${userToLookFor} not found in game settings.`);
-    // }
+    if (userIndex === -1) {
+        console.log(`User ${userToLookFor} not found in game settings.`);
+        return "notFound"
+    }
 
 
 
@@ -132,7 +162,7 @@ function processOneGame(gameFileLocation) {
 
 }
 
-
+//check if 'userToLookFor' won the game. Return true for win, false for loss.
 function checkWinOrLoss(game, userToLookFor) {
     //check if the user won or lost - singles only
     returnValue = false;

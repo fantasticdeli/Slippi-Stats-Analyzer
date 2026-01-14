@@ -175,8 +175,8 @@ function checkWinOrLoss(game, userToLookFor) {
     //check if the user won or lost - singles only
     returnValue = false;
     game.getWinners().forEach((winner) => {
-        if (((userToLookFor.displayName != "") && (settings.players[i].displayName == userToLookFor.displayName))
-        || ((userToLookFor.connectCode != "") && (settings.players[i].connectCode == userToLookFor.connectCode))) {
+        if ((settings.players[winner.playerIndex].displayName === userToLookFor.displayName) 
+        || (settings.players[winner.playerIndex].connectCode === userToLookFor.connectCode)) {
             // a win
             // console.log(`Player ${userToLookFor} won on stage ${stages.getStageName(settings.stageId)}!`);
             returnValue = true;
